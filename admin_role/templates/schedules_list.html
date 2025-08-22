@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Schedules List | Faculty Leave Management{% endblock %}
+
+{% block extracss %}
+<!-- bootstrap-datepicker css -->
+<link href="{% static 'assets/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css' %}" rel="stylesheet" >
+
+<!-- DataTables -->
+<link href="{% static 'assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css' %}" rel="stylesheet"  />
+
+<!-- Responsive datatable examples -->
+<link href="{% static 'assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css' %}" rel="stylesheet" />
+
+<!-- Custom CSS for schedule list -->
+<style>
+    .schedule-row:hover {
+        background-color: rgba(52, 195, 143, 0.15);
+        transition: background-color 0.3s;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- start page title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0 font-size-18">Schedules List</h4>
+
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);">Schedules</a></li>
+                    <li class="breadcrumb-item active">Schedules List</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end page title -->
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body border-bottom">
+                <div class="d-flex align-items-center">
+                    <h5 class="mb-0 card-title flex-grow-1">Schedules Lists</h5>
+                </div>
+            </div>
+            <div class="card-body border-bottom">
+                <div class="row gap-3">
+                    <div class="col-xxl-3 col-lg-5">
+                        <input type="search" class="form-control" id="searchTableList" placeholder="Search for ...">
+                    </div>
+                    <div class="col-xxl-3 col-lg-5">
+                        <select class="form-select" id="idType" aria-label="Default select example">
+                            <option value="all" {% if filtered_type == 'all' %}selected{% endif %}>Select Type</option>
+                            <option value="Full Time" {% if filtered_type == 'Full Time' %}selected{% endif %}>Full Time Schedules</option>
+                            <option value="Part Time" {% if filtered_type == 'Part Time' %}selected{% endif %}>Temporary Schedules</option>
+                        </select>
+                    </div>
+                    <div class="col-xxl-2 col-lg-4 ms-auto">
+                        <button type="button" class="btn btn-soft-secondary w-100" onclick="filterSchedules();"><i class="mdi mdi-filter-outline align-middle"></i> Filter</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive" >
+                    <table class="table align-middle table-nowrap mb-0" style="font-size: 15px;">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="align-middle">Faculty ID</th>
+                                <th class="align-middle">Faculty Name</th>
+                                <th class="align-middle">Department</th>
+                                <th class="align-middle">Date</th>
+                                <th class="align-middle">Schedules</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scheduleTableBody">
+                            <!-- Show all faculty entries -->
+                            {% if filtered_type == 'all' or filtered_type == 'Full Time' %}
+                                {% for faculty in faculties %}
+                                <tr class="schedule-row">
+                                    <td>{{ faculty.faculty_id }}</td>
+                                    <td>{{ faculty.faculty_name }}</td>
+                                    <td>{{ faculty.department.department_name }}</td>
+                                    <td>
+                                        {% if faculty.faculty_id in faculty_schedules %}
+                                            {{ faculty_schedules|get_item:faculty.faculty_id|date:"Y-m-d" }}
+                                        {% else %}
+                                            <span class="text-muted">Not created yet</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'schedules' faculty.id %}"><button type="button" class="btn btn-primary btn-sm btn-rounded waves-effect waves-light">
+                                            View Schedule
+                                        </button></a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% endif %}
+                            
+                            <!-- Show all leave applications -->
+                            {% if filtered_type == 'all' or filtered_type == 'Part Time' %}
+                                {% for leave in leave_applications %}
+                                <tr class="schedule-row">
+                                    <td>{{ leave.employee_id }}</td>
+                                    <td>{{ leave.employee_name }}</td>
+                                    <td>{{ leave.department.department_name }}</td>
+                                    <td>
+                                        {% if leave.employee_id in faculty_schedules %}
+                                            {{ faculty_schedules|get_item:leave.employee_id|date:"Y-m-d" }}
+                                        {% else %}
+                                            <span class="text-muted">Not created yet</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <!-- Find corresponding faculty ID -->
+                                        {% for fac in faculties %}
+                                            {% if fac.faculty_id == leave.employee_id %}
+                                                <a href="{% url 'schedules' fac.id %}"><button type="button" class="btn btn-primary btn-sm btn-rounded waves-effect waves-light">
+                                                    View Schedule
+                                                </button></a>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- end table responsive -->
+            </div>
+            <!-- end card body -->
+        </div><!--end card-->
+    </div><!--end col-->
+</div><!--end row-->
+
+<!-- Modal -->
+<div class="modal fade" id="jobDelete" tabindex="-1" aria-labelledby="jobDeleteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-body px-4 py-5 text-center">
+                <button type="button" class="btn-close position-absolute end-0 top-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="avatar-sm mb-4 mx-auto">
+                    <div class="avatar-title bg-primary text-primary bg-opacity-10 font-size-20 rounded-3">
+                        <i class="mdi mdi-trash-can-outline"></i>
+                    </div>
+                </div>
+                <p class="text-muted font-size-16 mb-4">Are you sure you want to permanently erase the job.</p>
+                
+                <div class="hstack gap-2 justify-content-center mb-0">
+                    <button type="button" class="btn btn-danger">Delete Now</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+<!-- bootstrap-datepicker js -->
+<script src="{% static 'assets/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js' %}"></script>
+
+<!-- Required datatable js -->
+<script src="{% static 'assets/libs/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+
+<!-- Responsive examples -->
+<script src="{% static 'assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js' %}"></script>
+
+<!-- Add custom JavaScript for filtering -->
+<script>
+    // Function to handle filtering schedules
+    function filterSchedules() {
+        // Get the selected value
+        var filterType = document.getElementById('idType').value;
+        
+        // Create a URL with the filter parameter
+        var url = window.location.pathname + '?filter_type=' + encodeURIComponent(filterType);
+        
+        // Redirect to the URL with the filter parameter
+        window.location.href = url;
+    }
+    
+    // Function to filter schedules based on search input
+    document.getElementById('searchTableList').addEventListener('keyup', function() {
+        var searchText = this.value.toLowerCase();
+        var rows = document.querySelectorAll('#scheduleTableBody tr');
+        
+        rows.forEach(function(row) {
+            var id = row.cells[0].textContent.toLowerCase();
+            var name = row.cells[1].textContent.toLowerCase();
+            var department = row.cells[2].textContent.toLowerCase();
+            
+            if (id.includes(searchText) || name.includes(searchText) || department.includes(searchText)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}

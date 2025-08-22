@@ -1,0 +1,502 @@
+{%load static%}
+<!doctype html>
+<html lang="en">
+
+    <head>
+        
+        <meta charset="utf-8" />
+        <title>Contact Users List | Skote - Admin & Dashboard Template</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
+        <meta content="Themesbrand" name="author" />
+        <!-- App favicon -->
+        <link rel="shortcut icon" href="{% static 'assets/images/favicon.ico' %}">
+
+        <!-- select2 css -->
+        <link href="{% static 'assets/libs/select2/css/select2.min.css'  %}" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="{% static 'assets/css/contact_list.css'  %}">
+
+        <!-- DataTables -->
+        <link href="{% static 'assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css'  %}" rel="stylesheet" type="text/css" />
+
+        <!-- Responsive datatable examples -->
+        <link href="{% static 'assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css'  %}" rel="stylesheet" type="text/css" />  
+
+        <!-- Bootstrap Css -->
+        <link href="{% static 'assets/css/bootstrap.min.css'  %}" id="bootstrap-style" rel="stylesheet" type="text/css" />
+        <!-- Icons Css -->
+        <link href="{% static 'assets/css/icons.min.css'  %}" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <!-- App Css-->
+        <link href="{% static 'assets/css/app.min.css'  %}" id="app-style" rel="stylesheet" type="text/css" />
+        <!-- App js -->
+        <script src="{% static 'assets/js/plugin.js' %}"></script>
+
+    </head>
+
+    <body data-sidebar="dark">
+
+    <!-- <body data-layout="horizontal" data-topbar="dark"> -->
+
+        <!-- Begin page -->
+        <div id="layout-wrapper">
+
+            
+            <header id="page-topbar">
+                <div class="navbar-header">
+                    <div class="d-flex">
+                        <!-- LOGO -->
+                        <div class="navbar-brand-box">
+                            <a href="{% url 'index'%}" class="logo logo-dark">
+                                <span class="logo-sm">
+                                    <img src="{% static 'assets/images/logo.svg' %}" alt="" height="22">
+                                </span>
+                                <span class="logo-lg">
+                                    <img src="{% static 'assets/images/logo-dark.png' %}" alt="" height="17">
+                                </span>
+                            </a>
+
+                            <a href="{% url 'index'%}" class="logo logo-light">
+                                <span class="logo-sm">
+                                    <img src="{% static 'assets/images/logo-light.svg' %}" alt="" height="22">
+                                </span>
+                                <span class="logo-lg">
+                                    <img src="{% static 'assets/images/logo-light.png' %}" alt="" height="19">
+                                </span>
+                            </a>
+                        </div>
+
+                        <button type="button" class="btn btn-sm px-3 font-size-16 header-item waves-effect" id="vertical-menu-btn">
+                            <i class="fa fa-fw fa-bars"></i>
+                        </button>
+
+                        <!-- App Search-->
+                        <form class="app-search d-none d-lg-block">
+                            <div class="position-relative">
+                                <input type="text" class="form-control" placeholder="Search...">
+                                <span class="bx bx-search-alt"></span>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="d-flex">
+
+                        <div class="dropdown d-inline-block d-lg-none ms-2">
+                            <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-search-dropdown"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="mdi mdi-magnify"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+                                aria-labelledby="page-header-search-dropdown">
+        
+                                <form class="p-3">
+                                    <div class="form-group m-0">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" placeholder="Search ..." aria-label="Recipient's username">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-primary" type="submit"><i class="mdi mdi-magnify"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="dropdown d-inline-block">
+                            <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <img class="rounded-circle header-profile-user" src="{% static 'assets/images/users/avatar-1.jpg' %}"
+                                    alt="Header Avatar">
+                                <span class="d-none d-xl-inline-block ms-1" key="t-henry">Henry</span>
+                                <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <!-- item-->
+                                <a class="dropdown-item" href="#"><i class="bx bx-user font-size-16 align-middle me-1"></i> <span key="t-profile">Profile</span></a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-danger" href="#"><i class="bx bx-power-off font-size-16 align-middle me-1 text-danger"></i> <span key="t-logout">Logout</span></a>
+                            </div>
+                        </div>
+
+                        <div class="dropdown d-inline-block">
+                            <button type="button" class="btn header-item noti-icon right-bar-toggle waves-effect">
+                                <i class="bx bx-cog bx-spin"></i>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </header>
+
+            <!-- ========== Left Sidebar Start ========== -->
+            <div class="vertical-menu">
+
+                <div data-simplebar class="h-100">
+
+                    <!--- Sidemenu -->
+                    <div id="sidebar-menu">
+                        <!-- Left Menu Start -->
+                        <ul class="metismenu list-unstyled" id="side-menu">
+                            <li class="menu-title" key="t-menu">Menu</li>
+
+                            <li>
+                                <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                    <i class="bx bx-home-circle"></i>
+                                    <span key="t-dashboards">Dashboards</span>
+                                </a>
+                                <ul class="sub-menu" aria-expanded="false">
+                                    <li><a href="{% url 'index' %}" key="t-default">Home</a></li>
+                                    <li><a href="{% url 'faculties' %}" key="t-saas">Faculties</a></li>
+                                    <li><a href="{% url 'hods' %}" key="t-crypto">HOD's</a></li>
+                                    <li><a href="{% url 'departments' %}" key="t-blog">Departments</a></li>
+                                    <li><a href="{% url 'schedules_list' %}" key="t-jobs">Schedules</a></li>
+                                    
+                                    <li><a href="{% url 'leaves' %}" key="t-jobs">Leave Types</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- Sidebar -->
+                </div>
+            </div>
+            <!-- Left Sidebar End -->
+
+            
+
+            <!-- ============================================================== -->
+            <!-- Start right Content here -->
+            <!-- ============================================================== -->
+            <div class="main-content">
+
+                <div class="page-content">
+                    <div class="container-fluid">
+
+                        <!-- start page title -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                                    <h4 class="mb-sm-0 font-size-18">Faculties List</h4>
+
+                                    <div class="page-title-right">
+                                        <ol class="breadcrumb m-0">
+                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Faculty</a></li>
+                                            <li class="breadcrumb-item active">Users List</li>
+                                        </ol>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <!-- end page title -->
+
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row mb-2">
+                                            <div class="col-sm-4">
+                                                <div class="search-box me-2 mb-2 d-inline-block">
+                                                    <div class="position-relative">
+                                                        <input type="text" class="form-control" id="searchTableList" placeholder="Search...">
+                                                        <i class="bx bx-search-alt search-icon"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-8">
+                                                <div class="text-sm-end">
+                                                    <button type="button" data-bs-toggle="modal" data-bs-target="#newContactModal" class="btn btn-success btn-rounded waves-effect waves-light addContact-modal mb-2"><i class="mdi mdi-plus me-1"></i>Add HOD</button>
+                                                </div>
+                                            </div><!-- end col-->
+                                        </div>
+                                        <!-- end row -->
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        <div class="table-responsive">
+                                            <table class="table align-middle table-nowrap table-hover dt-responsive nowrap w-100" id="userList-table" style="font-size: 15px;">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th scope="col">ID</th>
+                                                        <th scope="col">Name</th>
+                                                        <th scope="col">Email-ID</th>
+                                                        <th scope="col">Subject</th>
+                                                        <th scope="col">Department</th>
+                                                        <th scope="col" style="width: 200px;">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for hod in hods %}
+                                                    <tr>
+                                                        <td>{{ hod.hod_id }}</td>
+                                                        <td>{{ hod.hod_name }}</td>
+                                                        <td>{{ hod.email_id }}</td>
+                                                        <td>{{ hod.subject }}</td>
+                                                        <td>{{ hod.department.department_name }}</td>
+                                                        <td><i class="fa-solid fa-pen-to-square" data-bs-toggle="modal" data-bs-target="#edit{{ hod.id }}" style="color: black;"></i>
+                                                            {% if hod.id %}
+                                                            <a href="{% url 'delete_hod' hod.id %}" style="color: black;"><i class="fa-solid fa-trash"></i></a>
+                                                            {% else %}
+                                                            <p class="text-danger">Invalid Department</p>
+                                                            {% endif %}
+                                                        </td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <!-- end table responsive -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- container-fluid -->
+                </div>
+                <!-- End Page-content -->
+                
+                <footer class="footer">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <script>document.write(new Date().getFullYear())</script> © Skote.
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="text-sm-end d-none d-sm-block">
+                                    Design & Develop by Themesbrand
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+            <!-- end main content-->
+
+        </div>
+        <!-- END layout-wrapper -->
+
+        <!-- Add HOD Modal -->
+        <div class="modal fade" id="newContactModal" tabindex="-1" aria-labelledby="newContactModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="newContactModalLabel">Add HOD</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form autocomplete="off" class="needs-validation createContact-form" id="createContact-form" novalidate method="POST" action="{% url 'add_hod' %}">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="mb-3">
+                                        <label for="userid-input" class="form-label">ID</label>
+                                        <input type="text" id="userid-input" name="hod_id" class="form-control" placeholder="Enter ID" required />
+                                        <div class="invalid-feedback">Please enter an ID.</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="username-input" class="form-label">User Name</label>
+                                        <input type="text" id="username-input" name="hod_name" class="form-control" placeholder="Enter name" required />
+                                        <div class="invalid-feedback">Please enter a name.</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="designation-input" class="form-label">Subject</label>
+                                        <input type="text" id="designation-input" name="subject" class="form-control" placeholder="Enter Subject" required />
+                                        <div class="invalid-feedback">Please enter a subject.</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="email-input" class="form-label">Email</label>
+                                        <input type="email" id="email-input" name="email_id" class="form-control" placeholder="Enter email" required />
+                                        <div class="invalid-feedback">Please enter email.</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="department-input" class="form-label">Department</label>
+                                        <select class="form-select" aria-label="Default select example" id="department-input" name="department_id">
+                                            <option selected>Choose</option>
+                                            {% for department in departments %}
+                                                <option value="{{ department.id }}">{{ department.department_name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-lg-12">
+                                    <div class="text-end">
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" id="addContact-btn" class="btn btn-success">Add HOD</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end newContactModal -->
+
+        <!-- Edit HOD Modal -->
+        {% for hod in hods %}
+        <div class="modal fade" id="edit{{ hod.id }}" tabindex="-1" aria-labelledby="newContactModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="newContactModalLabel">Edit HOD</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form autocomplete="off" class="needs-validation createContact-form" id="createContact-form" novalidate method="POST" action="{% url 'edit_hod' hod.id %}">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="mb-3">
+                                        <label for="userid-input" class="form-label">ID</label>
+                                        <input type="text" id="userid-input" name="hod_id" class="form-control" value="{{ hod.hod_id }}" placeholder="Enter ID" required />
+                                        <div class="invalid-feedback">Please enter an ID.</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="username-input" class="form-label">User Name</label>
+                                        <input type="text" id="username-input" name="hod_name" class="form-control" value="{{ hod.hod_name }}" placeholder="Enter name" required />
+                                        <div class="invalid-feedback">Please enter a name.</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="designation-input" class="form-label">Subject</label>
+                                        <input type="text" id="designation-input" name="subject" class="form-control" value="{{ hod.subject }}" placeholder="Enter Subject" required />
+                                        <div class="invalid-feedback">Please enter a subject.</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="email-input" class="form-label">Email</label>
+                                        <input type="email" id="email-input" name="email_id" class="form-control" value="{{ hod.email_id }}" placeholder="Enter email" required />
+                                        <div class="invalid-feedback">Please enter email.</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="department-input" class="form-label">Department</label>
+                                        <select class="form-select" aria-label="Default select example" id="department-input" name="department_id" required>
+                                            <option value="" disabled selected>Choose</option>
+                                            {% for department in departments %}
+                                                <option value="{{ department.id }}" {% if department.id == hod.department.id %}selected{% endif %}>{{ department.department_name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <div class="invalid-feedback">Please select a department.</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-lg-12">
+                                    <div class="text-end">
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" id="addContact-btn" class="btn btn-success">Save Changes</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        <!-- end editHODModal -->
+
+        <!-- removeItemModal -->
+        <!-- <div class="modal fade" id="removeItemModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-sm">
+                <div class="modal-content">
+                    <div class="modal-body px-4 py-5 text-center">
+                        <button type="button" class="btn-close position-absolute end-0 top-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div class="avatar-sm mb-4 mx-auto">
+                            <div class="avatar-title bg-primary text-primary bg-opacity-10 font-size-20 rounded-3">
+                                <i class="mdi mdi-trash-can-outline"></i>
+                            </div>
+                        </div>
+                        <p class="text-muted font-size-16 mb-4">Are you Sure You want to Remove this User ?</p>
+                        
+                        <div class="hstack gap-2 justify-content-center mb-0">
+                            <button type="button" class="btn btn-danger" id="remove-item">Remove Now</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+        <!-- end removeItemModal -->
+
+        <!-- Right Sidebar -->
+        <div class="right-bar">
+            <div data-simplebar class="h-100">
+                <div class="rightbar-title d-flex align-items-center px-3 py-4">
+            
+                    <h5 class="m-0 me-2">Settings</h5>
+
+                    <a href="javascript:void(0);" class="right-bar-toggle ms-auto">
+                        <i class="mdi mdi-close noti-icon"></i>
+                    </a>
+                </div>
+
+                <!-- Settings -->
+                <hr class="mt-0" />
+                <h6 class="text-center mb-0">Choose Layouts</h6>
+
+                <div class="p-4">
+                    <div class="mb-2">
+                        <img src="{% static 'assets/images/layouts/layout-1.jpg' %}" class="img-thumbnail" alt="layout images">
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input theme-choice" type="checkbox" id="light-mode-switch" checked>
+                        <label class="form-check-label" for="light-mode-switch">Light Mode</label>
+                    </div>
+    
+                    <div class="mb-2">
+                        <img src="{% static 'assets/images/layouts/layout-2.jpg' %}" class="img-thumbnail" alt="layout images">
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input theme-choice" type="checkbox" id="dark-mode-switch">
+                        <label class="form-check-label" for="dark-mode-switch">Dark Mode</label>
+                    </div>
+    
+                    <div class="mb-2">
+                        <img src="{% static 'assets/images/layouts/layout-3.jpg' %}" class="img-thumbnail" alt="layout images">
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input theme-choice" type="checkbox" id="rtl-mode-switch">
+                        <label class="form-check-label" for="rtl-mode-switch">RTL Mode</label>
+                    </div>
+
+                    <div class="mb-2">
+                        <img src="{% static 'assets/images/layouts/layout-4.jpg' %}" class="img-thumbnail" alt="layout images">
+                    </div>
+                    <div class="form-check form-switch mb-5">
+                        <input class="form-check-input theme-choice" type="checkbox" id="dark-rtl-mode-switch">
+                        <label class="form-check-label" for="dark-rtl-mode-switch">Dark RTL Mode</label>
+                    </div>
+
+            
+                </div>
+
+            </div> <!-- end slimscroll-menu-->
+        </div>
+        <!-- /Right-bar -->
+
+        <!-- Right bar overlay-->
+        <div class="rightbar-overlay"></div>
+
+        <!-- JAVASCRIPT -->
+        <script src="{% static 'assets/libs/jquery/jquery.min.js' %}"></script>
+        <script src="{% static 'assets/libs/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'assets/libs/metismenu/metisMenu.min.js' %}"></script>
+        <script src="{% static 'assets/libs/simplebar/simplebar.min.js' %}"></script>
+        <script src="{% static 'assets/libs/node-waves/waves.min.js' %}"></script>
+        <!-- select2 js -->
+        <script src="{% static 'assets/libs/select2/js/select2.min.js' %}"></script>
+
+        <!-- Required datatable js -->
+        <script src="{% static 'assets/libs/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+        <script src="{% static 'assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+        
+        <!-- Responsive examples -->
+        <script src="{% static 'assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+        <script src="{% static 'assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js' %}"></script>
+        
+        <!-- ecommerce-customer-list init -->
+        <!-- <script src="{% static 'assets/js/pages/contact-user-list.init.js' %}"></script> -->
+        <!-- App js -->
+        <script src="{% static 'assets/js/app.js' %}"></script>
+
+    </body>
+</html>

@@ -1,0 +1,901 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Schedules | Faculty Leave Management{% endblock %}
+
+{% block extracss %}
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.0/main.min.css' rel='stylesheet' />
+<style>
+    .fc-timegrid-event {
+        min-height: 60px !important;
+    }
+    .fc-event-title, .fc-event-time {
+        font-weight: bold;
+    }
+    .custom-event-content {
+        padding: 2px;
+        line-height: 1.3;
+    }
+    .custom-event-title {
+        font-weight: bold;
+        margin-bottom: 3px;
+        font-size: 13px;
+        white-space: normal;
+        display: block;
+    }
+    .custom-event-time {
+        font-size: 12px;
+        display: block;
+    }
+    .morning {
+        background-color: #4285f4 !important;
+        border-color: #3b77db !important;
+    }
+    .afternoon {
+        background-color: #34a853 !important;
+        border-color: #2d9348 !important;
+    }
+    .evening {
+        background-color: #ea4335 !important;
+        border-color: #d03c2f !important;
+    }
+    .regular-schedule {
+        background-color: #4285f4 !important;
+        border-color: #3b77db !important;
+    }
+    .replacement-schedule {
+        background-color: #dc3545 !important;
+        border-color: #b02a37 !important;
+    }
+    .faculty-as-replacement {
+        background-color: #28a745 !important;
+        border-color: #1e7e34 !important;
+    }
+    .leave-badge {
+        font-size: 12px;
+        padding: 4px 8px;
+        margin-right: 5px;
+    }
+    .schedule-badge {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+    }
+    .regular-schedule {
+        background-color: #3788d8; /* Default FullCalendar blue */
+    }
+    .replacement-schedule {
+        background-color: #dc3545; /* Bootstrap danger */
+    }
+    .faculty-as-replacement {
+        background-color: #28a745; /* Bootstrap success */
+    }
+    /* Make tooltip larger and more readable */
+    .tooltip-inner {
+        max-width: 300px;
+        padding: 8px 12px;
+        text-align: left;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- start page title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0 font-size-18">Schedule for {{ faculty.faculty_name }}</h4>
+
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="{% url 'schedules_list' %}">Schedules</a></li>
+                    <li class="breadcrumb-item active">{{ faculty.faculty_name }}'s Schedule</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end page title -->
+
+<!-- Active Leaves Section -->
+{% if active_leaves.exists %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Active Leaves</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>Leave Type</th>
+                                <th>From Date</th>
+                                <th>To Date</th>
+                                <th>Status</th>
+                                <th>Replacement Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for leave in active_leaves %}
+                            <tr>
+                                <td>{{ leave.leave_type }}</td>
+                                <td>{{ leave.from_date }}</td>
+                                <td>{{ leave.to_date }}</td>
+                                <td><span class="badge bg-success">{{ leave.status }}</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#replaceScheduleModal" 
+                                            data-leave-id="{{ leave.id }}" 
+                                            data-from-date="{{ leave.from_date }}" 
+                                            data-to-date="{{ leave.to_date }}">
+                                        Manage Replacements
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-end">
+            <button id="btn-new-schedule" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#newScheduleModal" data-create-schedule-url="{% url 'create_schedule' %}">
+                <i class="bx bx-plus me-1"></i> New Schedule
+            </button>
+            <button id="btn-clear-schedules" class="btn btn-danger">
+                <i class="bx bx-trash me-1"></i> Clear All Schedules
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Schedule Legend -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Schedule Legend</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="d-flex align-items-center mb-2">
+                    <div class="schedule-badge regular-schedule mr-2"></div>
+                    <span>Regular Schedule</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex align-items-center mb-2">
+                    <div class="schedule-badge replacement-schedule mr-2" style="background-color: #dc3545;"></div>
+                    <span>Replaced (Someone covering for you)</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex align-items-center mb-2">
+                    <div class="schedule-badge faculty-as-replacement mr-2" style="background-color: #28a745;"></div>
+                    <span>Covering (You replacing someone)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div id="calendar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Add Schedule Modal -->
+        <div class="modal fade" id="newScheduleModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header py-3 px-4 border-bottom-0">
+                        <h5 class="modal-title">Add Faculty Schedule</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-hidden="true"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <form class="needs-validation" id="new-schedule-form">
+                            {% csrf_token %}
+                            <input type="hidden" id="faculty-id" value="{{ faculty_id }}">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label class="form-label">Section Name</label>
+                                        <input class="form-control" placeholder="Enter section name"
+                                            type="text" name="section_name" id="section-name" required value="" />
+                                        <div class="invalid-feedback">Please provide a valid section name</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label class="form-label">Schedule Time</label>
+                                        <input class="form-control" type="datetime-local" name="start_time" id="start-time" required value="" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label class="form-label">End Time</label>
+                                        <input class="form-control" type="datetime-local" name="end_time" id="end-time" required value="" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-12 text-end">
+                                    <button type="button" class="btn btn-light me-1" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-success" id="save-schedule">Save</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Edit Schedule Modal -->
+        <div class="modal fade" id="editScheduleModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header py-3 px-4 border-bottom-0">
+                        <h5 class="modal-title">Edit Schedule</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-hidden="true"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <form class="needs-validation" id="edit-schedule-form">
+                            {% csrf_token %}
+                            <input type="hidden" id="edit-schedule-id" value="" />
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label class="form-label">Section Name</label>
+                                        <input class="form-control" placeholder="Enter section name"
+                                            type="text" name="section_name" id="edit-section-name" required value="" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label class="form-label">Schedule Time</label>
+                                        <input class="form-control" type="datetime-local" name="start_time" id="edit-start-time" required value="" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label class="form-label">End Time</label>
+                                        <input class="form-control" type="datetime-local" name="end_time" id="edit-end-time" required value="" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <button type="button" class="btn btn-danger" id="delete-schedule-btn">Delete</button>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <button type="button" class="btn btn-light me-1" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-success" id="update-schedule">Update</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manual Replacement Modal -->
+        <div class="modal fade" id="replaceScheduleModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header py-3 px-4 border-bottom-0">
+                        <h5 class="modal-title">Manage Replacements</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-hidden="true"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="alert alert-info">
+                            <p><strong>Managing replacements for leave period:</strong></p>
+                            <p id="leave-period-display"></p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h6>Current Replacements</h6>
+                            <div id="current-replacements-list">
+                                <div class="text-center p-3 text-muted">
+                                    <p>Loading replacements...</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <form id="manual-replacement-form">
+                            {% csrf_token %}
+                            <input type="hidden" id="leave-id" name="leave_id" value="" />
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label class="form-label">Select Schedule to Replace</label>
+                                        <select class="form-select" id="schedule-to-replace" required>
+                                            <option value="">Select a schedule</option>
+                                            {% for schedule in schedules %}
+                                                {% if not schedule.is_replacement %}
+                                                <option value="{{ schedule.id }}">{{ schedule.section_name }} ({{ schedule.start_time|date:"M d, Y H:i" }} - {{ schedule.end_time|date:"H:i" }})</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label class="form-label">Select Replacement Faculty</label>
+                                        <select class="form-select" id="replacement-faculty" required>
+                                            <option value="">Select a faculty</option>
+                                            {% for fac in faculties %}
+                                            <option value="{{ fac.id }}">{{ fac.faculty_name }} - {{ fac.department.department_name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-12 text-end">
+                                    <button type="button" class="btn btn-light me-1" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-success" id="assign-replacement">Assign Replacement</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Replacement Details Modal -->
+        <div class="modal fade" id="replacementDetailsModal" tabindex="-1" role="dialog" aria-labelledby="replacementDetailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="replacementDetailsModalLabel">Replacement Details</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Content will be dynamically populated -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- After the calendar div and before the modals -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Active Leaves & Replacements</h5>
+                        <button type="button" class="btn btn-sm btn-primary" id="refresh-leaves">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="active-leaves-container">
+                            <div class="text-center py-3">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <p class="mt-2">Loading active leaves...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+<!-- plugin js -->
+<script src="{% static 'assets/libs/moment/min/moment.min.js' %}"></script>
+<script src="{% static 'assets/libs/jquery-ui-dist/jquery-ui.min.js' %}"></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.0/main.min.js'></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const facultyId = document.getElementById('faculty-id').value;
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        // Calendar initialization
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'timeGridWeek',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            navLinks: true,
+            editable: true,
+            selectable: true,
+            eventTimeFormat: {
+                hour: 'numeric',
+                minute: '2-digit',
+                meridiem: 'short'
+            },
+            slotMinTime: '07:00:00',
+            slotMaxTime: '20:00:00',
+            events: function(info, successCallback, failureCallback) {
+                // Fetch events from the API
+                fetch(`/admin_role/api/schedules/${facultyId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("Fetched schedules:", data);
+                        successCallback(data);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching schedules:', error);
+                        failureCallback(error);
+                    });
+            },
+            eventDidMount: function(info) {
+                // Add tooltips with detailed information
+                const event = info.event;
+                const extendedProps = event.extendedProps;
+                let tooltipContent = '';
+
+                if (extendedProps.isReplacement) {
+                    if (extendedProps.replacedFacultyName) {
+                        // This is a replacement schedule (someone else is covering)
+                        tooltipContent = `
+                            <strong>${event.title}</strong><br>
+                            <span>Original Faculty: ${extendedProps.replacedFacultyName}</span><br>
+                            <span>Replacement: ${extendedProps.faculty_name}</span><br>
+                            <span>Time: ${moment(event.start).format('h:mm A')} - ${moment(event.end).format('h:mm A')}</span>
+                        `;
+                    } else if (extendedProps.replacingFacultyName) {
+                        // This faculty is replacing someone else
+                        tooltipContent = `
+                            <strong>${event.title}</strong><br>
+                            <span>You are replacing: ${extendedProps.replacingFacultyName}</span><br>
+                            <span>Section: ${extendedProps.originalScheduleInfo?.section_name || ''}</span><br>
+                            <span>Department: ${extendedProps.originalScheduleInfo?.department || ''}</span><br>
+                            <span>Time: ${moment(event.start).format('h:mm A')} - ${moment(event.end).format('h:mm A')}</span>
+                        `;
+                    }
+                } else {
+                    // Regular schedule
+                    tooltipContent = `
+                        <strong>${event.title}</strong><br>
+                        <span>Time: ${moment(event.start).format('h:mm A')} - ${moment(event.end).format('h:mm A')}</span>
+                    `;
+
+                    // If faculty is on leave and has replacement
+                    if (extendedProps.onLeave && extendedProps.hasReplacement) {
+                        tooltipContent += `<br><span class="text-success">Covered by: ${extendedProps.replacementInfo.faculty_name}</span>`;
+                    } else if (extendedProps.onLeave) {
+                        tooltipContent += `<br><span class="text-danger">On Leave - No Replacement Assigned</span>`;
+                    }
+                }
+
+                $(info.el).tooltip({
+                    title: tooltipContent,
+                    html: true,
+                    placement: 'top',
+                    container: 'body'
+                });
+            },
+            eventClick: function(info) {
+                // Handle event click - show edit modal or details
+                const event = info.event;
+                const extendedProps = event.extendedProps;
+                
+                // Don't allow editing of replacement schedules
+                if (extendedProps.isReplacement) {
+                    // Just show details for replacement schedules
+                    showReplacementDetails(event);
+                    return;
+                }
+
+                // For regular schedules, show edit modal
+                $('#edit-schedule-id').val(event.id);
+                $('#edit-section-name').val(event.title);
+                
+                // Convert event datetime to form datetime
+                const startDateTime = moment(event.start).format('YYYY-MM-DDTHH:mm');
+                const endDateTime = moment(event.end).format('YYYY-MM-DDTHH:mm');
+                
+                $('#edit-start-time').val(startDateTime);
+                $('#edit-end-time').val(endDateTime);
+                
+                $('#editScheduleModal').modal('show');
+            }
+        });
+        
+        calendar.render();
+
+        // Function to show replacement details
+        function showReplacementDetails(event) {
+            const extendedProps = event.extendedProps;
+            let modalTitle = '';
+            let modalBody = '';
+
+            if (extendedProps.replacedFacultyName) {
+                // This is a replacement schedule (someone else is covering)
+                modalTitle = 'Replacement Schedule Details';
+                modalBody = `
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">${event.title}</h5>
+                            <p class="card-text">
+                                <strong>Original Faculty:</strong> ${extendedProps.replacedFacultyName}<br>
+                                <strong>Replacement:</strong> ${extendedProps.faculty_name}<br>
+                                <strong>Time:</strong> ${moment(event.start).format('MMMM D, YYYY h:mm A')} - ${moment(event.end).format('h:mm A')}<br>
+                            </p>
+                            ${extendedProps.leaveInfo ? `
+                                <div class="alert alert-info">
+                                    <strong>Leave Information:</strong><br>
+                                    Type: ${extendedProps.leaveInfo.leave_type || 'Not specified'}<br>
+                                    Period: ${extendedProps.leaveInfo.from_date ? moment(extendedProps.leaveInfo.from_date).format('MMM D, YYYY') : 'Not specified'} 
+                                    to ${extendedProps.leaveInfo.to_date ? moment(extendedProps.leaveInfo.to_date).format('MMM D, YYYY') : 'Not specified'}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            } else if (extendedProps.replacingFacultyName) {
+                // This faculty is replacing someone else
+                modalTitle = 'Substitution Details';
+                modalBody = `
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">${event.title}</h5>
+                            <p class="card-text">
+                                <strong>You are replacing:</strong> ${extendedProps.replacingFacultyName}<br>
+                                <strong>Section:</strong> ${extendedProps.originalScheduleInfo?.section_name || 'Not specified'}<br>
+                                <strong>Department:</strong> ${extendedProps.originalScheduleInfo?.department || 'Not specified'}<br>
+                                <strong>Time:</strong> ${moment(event.start).format('MMMM D, YYYY h:mm A')} - ${moment(event.end).format('h:mm A')}<br>
+                            </p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Show the modal with details
+            $('#replacementDetailsModal .modal-title').html(modalTitle);
+            $('#replacementDetailsModal .modal-body').html(modalBody);
+            $('#replacementDetailsModal').modal('show');
+        }
+
+        // Add event handler for new schedule form submission
+        document.getElementById('new-schedule-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const sectionName = document.getElementById('section-name').value;
+            const startTime = document.getElementById('start-time').value;
+            const endTime = document.getElementById('end-time').value;
+            const facultyId = document.getElementById('faculty-id').value;
+            
+            // Form validation
+            if (!sectionName || !startTime || !endTime) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            // Create schedule data
+            const scheduleData = {
+                section_name: sectionName,
+                start_time: startTime,
+                end_time: endTime,
+                faculty_id: facultyId
+            };
+            
+            // Send AJAX request to create schedule
+            fetch('/admin_role/api/create_schedule/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify(scheduleData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Close the modal
+                    $('#newScheduleModal').modal('hide');
+                    
+                    // Refresh the calendar
+                    calendar.refetchEvents();
+                    
+                    // Reset the form
+                    document.getElementById('new-schedule-form').reset();
+                    
+                    // Show success message
+                    alert('Schedule created successfully!');
+                } else {
+                    alert('Error creating schedule: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while creating the schedule');
+            });
+        });
+        
+        // Add event handler for edit schedule form submission
+        document.getElementById('edit-schedule-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const scheduleId = document.getElementById('edit-schedule-id').value;
+            const sectionName = document.getElementById('edit-section-name').value;
+            const startTime = document.getElementById('edit-start-time').value;
+            const endTime = document.getElementById('edit-end-time').value;
+            
+            // Form validation
+            if (!sectionName || !startTime || !endTime) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            // Create schedule data
+            const scheduleData = {
+                id: scheduleId,
+                section_name: sectionName,
+                start_time: startTime,
+                end_time: endTime
+            };
+            
+            // Send AJAX request to update schedule
+            fetch('/admin_role/api/update_schedule/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify(scheduleData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Close the modal
+                    $('#editScheduleModal').modal('hide');
+                    
+                    // Refresh the calendar
+                    calendar.refetchEvents();
+                    
+                    // Show success message
+                    alert('Schedule updated successfully!');
+                } else {
+                    alert('Error updating schedule: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating the schedule');
+            });
+        });
+        
+        // Add event handler for delete schedule button
+        document.getElementById('delete-schedule-btn').addEventListener('click', function() {
+            const scheduleId = document.getElementById('edit-schedule-id').value;
+            
+            if (confirm('Are you sure you want to delete this schedule?')) {
+                // Send AJAX request to delete schedule
+                fetch('/admin_role/api/delete_schedule/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ id: scheduleId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Close the modal
+                        $('#editScheduleModal').modal('hide');
+                        
+                        // Refresh the calendar
+                        calendar.refetchEvents();
+                        
+                        // Show success message
+                        alert('Schedule deleted successfully!');
+                    } else {
+                        alert('Error deleting schedule: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting the schedule');
+                });
+            }
+        });
+        
+        // Add dateClick handler for new schedule creation
+        calendar.setOption('dateClick', function(info) {
+            // Pre-fill the start time with the clicked time
+            const startDate = moment(info.date).format('YYYY-MM-DDTHH:mm');
+            const endDate = moment(info.date).add(1, 'hour').format('YYYY-MM-DDTHH:mm');
+            
+            $('#start-time').val(startDate);
+            $('#end-time').val(endDate);
+            
+            // Show the modal
+            $('#newScheduleModal').modal('show');
+        });
+
+        // Load current replacements for a leave period
+        function loadCurrentReplacements(fromDate, toDate) {
+            // This would typically fetch existing replacements for the given period
+            // For now, just show a message in the modal
+            $('#current-replacements').html(
+                '<div class="alert alert-info">' +
+                '<i class="fas fa-info-circle mr-2"></i>' +
+                'Loading replacements for period: ' + moment(fromDate).format('MMM D, YYYY') + ' to ' + moment(toDate).format('MMM D, YYYY') +
+                '</div>' +
+                '<div class="text-center">' +
+                '<div class="spinner-border text-primary" role="status">' +
+                '<span class="sr-only">Loading...</span>' +
+                '</div>' +
+                '</div>'
+            );
+            
+            // In a real implementation, you would fetch replacements and populate the table
+            setTimeout(function() {
+                $('#current-replacements').html(
+                    '<div class="alert alert-info">' +
+                    '<i class="fas fa-info-circle mr-2"></i>' +
+                    'Feature in development: Detailed replacement management will be available soon.' +
+                    '</div>'
+                );
+            }, 1500);
+        }
+
+        // Load active leaves
+        function loadActiveLeaves() {
+            const facultyId = document.getElementById('faculty-id').value;
+            
+            fetch('/admin_role/api/active_leaves/' + facultyId + '/')
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('active-leaves-container');
+                    
+                    if (data.length === 0) {
+                        container.innerHTML = '<div class="alert alert-info"><i class="fas fa-info-circle mr-2"></i> No active leaves found.</div>';
+                        return;
+                    }
+                    
+                    let html = '<div class="table-responsive"><table class="table table-hover"><thead><tr><th>Leave Type</th><th>Period</th><th>Status</th><th>Replacement Coverage</th><th>Actions</th></tr></thead><tbody>';
+                    
+                    data.forEach(leave => {
+                        const fromDate = leave.from_date ? moment(leave.from_date).format('MMM D, YYYY') : 'N/A';
+                        const toDate = leave.to_date ? moment(leave.to_date).format('MMM D, YYYY') : 'N/A';
+                        
+                        // Create coverage badge
+                        let coverageBadge = '';
+                        if (leave.replacements.is_fully_covered) {
+                            coverageBadge = '<span class="badge badge-success">Fully Covered</span>';
+                        } else if (leave.replacements.assigned > 0) {
+                            coverageBadge = '<span class="badge badge-warning">Partially Covered</span>';
+                        } else {
+                            coverageBadge = '<span class="badge badge-danger">Not Covered</span>';
+                        }
+                        
+                        html += '<tr><td>' + (leave.leave_type || 'N/A') + '</td><td>' + fromDate + ' to ' + toDate + '</td><td><span class="badge badge-primary">' + leave.status + '</span></td><td>' + coverageBadge + '<div class="small mt-1">' + leave.replacements.assigned + '/' + leave.replacements.needed + ' schedules covered</div></td><td><button type="button" class="btn btn-sm btn-info manage-replacements-btn" data-leave-id="' + leave.id + '" data-from-date="' + leave.from_date + '" data-to-date="' + leave.to_date + '" data-toggle="modal" data-target="#manageReplacementsModal"><i class="fas fa-user-friends mr-1"></i> Manage Replacements</button></td></tr>';
+                    });
+                    
+                    html += '</tbody></table></div>';
+                    
+                    container.innerHTML = html;
+                    
+                    // Add event listeners to the manage replacements buttons
+                    $('.manage-replacements-btn').on('click', function() {
+                        const leaveId = $(this).data('leave-id');
+                        const fromDate = $(this).data('from-date');
+                        const toDate = $(this).data('to-date');
+                        
+                        $('#leave-id').val(leaveId);
+                        $('#leave-period').text(moment(fromDate).format('MMM D, YYYY') + ' to ' + moment(toDate).format('MMM D, YYYY'));
+                        
+                        // Load current replacements for this leave (implement this function)
+                        loadCurrentReplacements(fromDate, toDate);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching active leaves:', error);
+                    document.getElementById('active-leaves-container').innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-circle mr-2"></i> Error loading active leaves. Please try again.</div>';
+                });
+        }
+        
+        // Initial load of active leaves
+        loadActiveLeaves();
+        
+        // Refresh button for active leaves
+        document.getElementById('refresh-leaves').addEventListener('click', function() {
+            const container = document.getElementById('active-leaves-container');
+            container.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div><p class="mt-2">Refreshing active leaves...</p></div>';
+            loadActiveLeaves();
+        });
+
+        // Add event handler for clear all schedules button
+        document.getElementById('btn-clear-schedules').addEventListener('click', function() {
+            const facultyId = document.getElementById('faculty-id').value;
+            
+            if (confirm('Are you sure you want to delete ALL schedules? This cannot be undone.')) {
+                // Send AJAX request to clear schedules
+                fetch(`/admin_role/clear_schedules/${facultyId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Refresh the calendar
+                        calendar.refetchEvents();
+                        
+                        // Show success message
+                        alert(data.message);
+                    } else {
+                        alert('Error clearing schedules: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while clearing schedules');
+                });
+            }
+        });
+    });
+</script>
+
+<!-- Add a modal for managing replacements -->
+<div class="modal fade" id="manageReplacementsModal" tabindex="-1" role="dialog" aria-labelledby="manageReplacementsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="manageReplacementsModalLabel">Manage Replacements</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="leave-id" value="">
+                
+                <div class="alert alert-info">
+                    <strong>Leave Period:</strong> <span id="leave-period"></span>
+                </div>
+                
+                <h6 class="mb-3">Current Replacements</h6>
+                <div id="current-replacements">
+                    <!-- Replacements will be loaded here -->
+                </div>
+                
+                <!-- Additional controls for managing replacements would go here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="save-replacements">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

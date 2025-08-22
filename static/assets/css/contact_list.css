@@ -1,0 +1,15 @@
+.select2-container--default .select2-selection--multiple {
+    min-height: 40px; /* Adjust height */
+    padding: 6px; /* Prevent overlap */
+    overflow-y: auto; /* Allow scrolling */
+  }
+  
+  .select2-container .select2-dropdown {
+    z-index: 9999 !important; /* Ensure dropdown appears above everything */
+  }
+  
+  .select2-results__option {
+    color: #333 !important; /* Fix text color */
+    background-color: #fff !important; /* Ensure proper background */
+  }
+  

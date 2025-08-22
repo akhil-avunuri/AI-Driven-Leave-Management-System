@@ -1,0 +1,323 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Leave Applications | Faculty Leave Management{% endblock %}
+
+{% block extracss %}
+<!-- select2 css -->
+<link href="{% static 'assets/libs/select2/css/select2.min.css' %}" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="{% static 'assets/css/contact_list.css' %}">
+
+<!-- DataTables -->
+<link href="{% static 'assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css' %}" rel="stylesheet" type="text/css" />
+
+<!-- Responsive datatable examples -->
+<link href="{% static 'assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css' %}" rel="stylesheet" type="text/css" />
+
+<!-- Font Awesome CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+{% endblock %}
+
+{% block content %}
+<!-- start page title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0 font-size-18">Leave Applications List</h4>
+
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);">Leave Applications</a></li>
+                    <li class="breadcrumb-item active">Applications List</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end page title -->
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row mb-2">
+                    <div class="col-sm-4">
+                        <div class="search-box me-2 mb-2 d-inline-block">
+                            <div class="position-relative">
+                                <input type="text" class="form-control" id="searchTableList" placeholder="Search...">
+                                <i class="bx bx-search-alt search-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="text-sm-end">
+                            <button type="button" data-bs-toggle="modal" data-bs-target="#newContactModal" class="btn btn-success btn-rounded waves-effect waves-light addContact-modal mb-2"><i class="mdi mdi-plus me-1"></i>Add Leave Application</button>
+                        </div>
+                    </div><!-- end col-->
+                </div>
+                <!-- end row -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+                <div class="table-responsive">
+                    <table class="table align-middle table-nowrap table-hover dt-responsive nowrap w-100" id="userList-table" style="font-size: 15px;">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Employee ID</th>
+                                <th scope="col">Employee Name</th>
+                                <th scope="col">Department</th>
+                                <th scope="col">Leave Type</th>
+                                <th scope="col">From Date</th>
+                                <th scope="col">To Date</th>
+                                <th scope="col">Applied At</th>
+                                <th scope="col">Status</th>
+                                <th scope="col" style="width: 200px;">Action</th>
+                            </tr>
+                            {% for application in applications %}
+                            <tr>
+                                <td>{{application.employee_id}}</td>
+                                <td>{{application.employee_name}}</td>
+                                <td>{{application.department.department_name}}</td>
+                                <td>{{application.leave_type.leave_name}}</td>
+                                <td>{{application.from_date}}</td>
+                                <td>{{application.to_date}}</td>
+                                <td>{{application.applied_at}}</td>
+                                <td>
+                                    {% if application.status == 'Pending' %}
+                                        <span class="badge bg-warning">Pending</span>
+                                    {% elif application.status == 'Approved' %}
+                                        <span class="badge bg-success">Approved</span>
+                                    {% elif application.status == 'Rejected' %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{application.status}}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <i class="fa-solid fa-pen-to-square" data-bs-toggle="modal" data-bs-target="#edit{{ application.id }}" style="color: black;"></i>
+                                    {% if application.id %}    
+                                        <a href="{% url 'delete_application' application.id %}" style="color: black;"><i class="fa-solid fa-trash"></i></a>
+                                    {% else %}
+                                        <p class="text-danger">Invalid application</p>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </thead>
+                    </table>
+                </div>
+                <!-- end table responsive -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="newContactModal" tabindex="-1" aria-labelledby="newContactModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newContactModalLabel">Add Leave Application</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form autocomplete="off" class="needs-validation createContact-form" id="createContact-form" novalidate method="POST" action="{% url 'add_application' %}">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label for="emp-id-input" class="form-label">Employee ID</label>
+                                <input type="text" id="emp-id-input" name="employee_id" class="form-control" placeholder="Enter Employee ID" required />
+                                <div class="invalid-feedback">Please enter an employee ID.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label for="emp-name-input" class="form-label">Employee Name</label>
+                                <input type="text" id="emp-name-input" name="employee_name" class="form-control" placeholder="Enter Employee Name" required />
+                                <div class="invalid-feedback">Please enter an employee name.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label for="department-select" class="form-label">Department</label>
+                                <select class="form-control" name="department" id="department-select" required>
+                                    <option value="">Select Department</option>
+                                    {% for department in departments %}
+                                        <option value="{{ department.id }}">{{ department.department_name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">Please select a department.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label for="leave-type-select" class="form-label">Leave Type</label>
+                                <select class="form-control" name="leave_type" id="leave-type-select" required>
+                                    <option value="">Select Leave Type</option>
+                                    {% for leave_type in leave_types %}
+                                        <option value="{{ leave_type.id }}">{{ leave_type.leave_name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">Please select a leave type.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label for="desc-input" class="form-label">Leave Description</label>
+                                <textarea id="desc-input" name="leave_description" class="form-control" placeholder="Enter Description" required></textarea>
+                                <div class="invalid-feedback">Please enter a leave description.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label for="from-date-input" class="form-label">From Date</label>
+                                <input type="date" id="from-date-input" name="from_date" class="form-control" required />
+                                <div class="invalid-feedback">Please select a from date.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label for="to-date-input" class="form-label">To Date</label>
+                                <input type="date" id="to-date-input" name="to_date" class="form-control" required />
+                                <div class="invalid-feedback">Please select a to date.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label for="status-select" class="form-label">Status</label>
+                                <select class="form-control" name="status" id="status-select" required>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Approved">Approved</option>
+                                    <option value="Rejected">Rejected</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a status.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="text-end">
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" id="addContact-btn" class="btn btn-success">Add</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end newContactModal -->
+
+<!-- edit Modal -->
+{% for application in applications %}
+<div class="modal fade" id="edit{{ application.id }}" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Leave Application</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form autocomplete="off" class="needs-validation editForm" id="edit-form-{{ application.id }}" novalidate method="POST" action="{% url 'edit_application' application.id %}">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label for="edit-emp-id-{{ application.id }}" class="form-label">Employee ID</label>
+                                <input type="text" id="edit-emp-id-{{ application.id }}" name="employee_id" class="form-control" value="{{ application.employee_id }}" placeholder="Enter Employee ID" required />
+                                <div class="invalid-feedback">Please enter an employee ID.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label for="edit-emp-name-{{ application.id }}" class="form-label">Employee Name</label>
+                                <input type="text" id="edit-emp-name-{{ application.id }}" name="employee_name" class="form-control" value="{{ application.employee_name }}" placeholder="Enter Employee Name" required />
+                                <div class="invalid-feedback">Please enter an employee name.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label for="edit-department-{{ application.id }}" class="form-label">Department</label>
+                                <select class="form-control" name="department" id="edit-department-{{ application.id }}" required>
+                                    <option value="">Select Department</option>
+                                    {% for department in departments %}
+                                        <option value="{{ department.id }}" {% if department.id == application.department.id %}selected{% endif %}>{{ department.department_name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">Please select a department.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label for="edit-leave-type-{{ application.id }}" class="form-label">Leave Type</label>
+                                <select class="form-control" name="leave_type" id="edit-leave-type-{{ application.id }}" required>
+                                    <option value="">Select Leave Type</option>
+                                    {% for leave_type in leave_types %}
+                                        <option value="{{ leave_type.id }}" {% if leave_type.id == application.leave_type.id %}selected{% endif %}>{{ leave_type.leave_name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">Please select a leave type.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label for="edit-desc-{{ application.id }}" class="form-label">Leave Description</label>
+                                <textarea id="edit-desc-{{ application.id }}" name="leave_description" class="form-control" placeholder="Enter Description" required>{{ application.leave_description }}</textarea>
+                                <div class="invalid-feedback">Please enter a leave description.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label for="edit-from-date-{{ application.id }}" class="form-label">From Date</label>
+                                <input type="date" id="edit-from-date-{{ application.id }}" name="from_date" class="form-control" value="{{ application.from_date|date:'Y-m-d' }}" required />
+                                <div class="invalid-feedback">Please select a from date.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label for="edit-to-date-{{ application.id }}" class="form-label">To Date</label>
+                                <input type="date" id="edit-to-date-{{ application.id }}" name="to_date" class="form-control" value="{{ application.to_date|date:'Y-m-d' }}" required />
+                                <div class="invalid-feedback">Please select a to date.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label for="edit-status-{{ application.id }}" class="form-label">Status</label>
+                                <select class="form-control" name="status" id="edit-status-{{ application.id }}" required>
+                                    <option value="Pending" {% if application.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                    <option value="Approved" {% if application.status == 'Approved' %}selected{% endif %}>Approved</option>
+                                    <option value="Rejected" {% if application.status == 'Rejected' %}selected{% endif %}>Rejected</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a status.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="text-end">
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-success">Update</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+<!-- end editmodal -->
+{% endblock %}
+
+{% block extrajs %}
+<!-- select2 js -->
+<script src="{% static 'assets/libs/select2/js/select2.min.js' %}"></script>
+
+<!-- Required datatable js -->
+<script src="{% static 'assets/libs/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+
+<!-- Responsive examples -->
+<script src="{% static 'assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js' %}"></script>
+{% endblock %} 

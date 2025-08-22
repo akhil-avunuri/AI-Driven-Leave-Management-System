@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini API Test</title>
+    <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet">
+    <style>
+        body { padding: 2rem; }
+        pre { background: #f8f9fa; padding: 1rem; border-radius: 4px; }
+        .result { margin-top: 1rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gemini API Test</h1>
+        <p>Use this page to test if your Gemini API integration is working correctly.</p>
+        
+        <div class="card mb-4">
+            <div class="card-header">Test the API</div>
+            <div class="card-body">
+                <button id="test-api" class="btn btn-primary">Test Gemini API</button>
+                <div class="result mt-3" id="api-result">
+                    <p><em>Click the button to test the API...</em></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">Test Probability Score</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="leave-text" class="form-label">Enter leave description:</label>
+                    <textarea class="form-control" id="leave-text" rows="4" placeholder="Enter leave description to test the probability score calculation..."></textarea>
+                </div>
+                <button id="test-probability" class="btn btn-success">Get Probability Score</button>
+                <div class="result mt-3" id="probability-result">
+                    <p><em>Enter text and click the button to test...</em></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="{% static 'assets/libs/jquery/jquery.min.js' %}"></script>
+    <script>
+        // Test the Gemini API
+        document.getElementById('test-api').addEventListener('click', function() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.innerHTML = '<p>Testing API...</p>';
+            
+            fetch('/employees/test_gemini_api/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                let html = '<h5>API Test Result:</h5>';
+                html += `<p>Status: <strong>${data.status}</strong></p>`;
+                html += `<p>API Key Configured: <strong>${data.api_key_configured}</strong></p>`;
+                html += `<p>API Key Preview: <code>${data.api_key_preview || 'Not available'}</code></p>`;
+                html += '<h6>Raw Response:</h6>';
+                html += `<pre>${data.raw_response || 'No response'}</pre>`;
+                
+                if (data.error) {
+                    html += '<h6>Error:</h6>';
+                    html += `<pre>${data.error}</pre>`;
+                    html += '<h6>Traceback:</h6>';
+                    html += `<pre>${data.traceback || 'No traceback'}</pre>`;
+                }
+                
+                resultDiv.innerHTML = html;
+            })
+            .catch(error => {
+                resultDiv.innerHTML = `<p>Error: ${error.message}</p>`;
+            });
+        });
+        
+        // Test the probability score
+        document.getElementById('test-probability').addEventListener('click', function() {
+            const leaveText = document.getElementById('leave-text').value;
+            const resultDiv = document.getElementById('probability-result');
+            
+            if (!leaveText.trim()) {
+                resultDiv.innerHTML = '<p class="text-danger">Please enter some text first.</p>';
+                return;
+            }
+            
+            resultDiv.innerHTML = '<p>Calculating probability score...</p>';
+            
+            fetch('/employees/get_probability_score/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ leave_description: leaveText })
+            })
+            .then(response => response.json())
+            .then(data => {
+                let html = '<h5>Probability Score Result:</h5>';
+                
+                if (data.probability_score !== undefined) {
+                    const score = parseFloat(data.probability_score);
+                    const percentage = (score * 100).toFixed(1);
+                    
+                    let color = score < 0.4 ? '#dc3545' : (score < 0.7 ? '#ffc107' : '#28a745');
+                    
+                    html += `<p>Score: <strong style="color: ${color};">${percentage}%</strong></p>`;
+                } else {
+                    html += '<p class="text-danger">No probability score returned</p>';
+                }
+                
+                if (data.error) {
+                    html += `<p>Error: <span class="text-danger">${data.error}</span></p>`;
+                }
+                
+                if (data.raw_response) {
+                    html += '<h6>Raw AI Response:</h6>';
+                    html += `<pre>${data.raw_response}</pre>`;
+                }
+                
+                resultDiv.innerHTML = html;
+            })
+            .catch(error => {
+                resultDiv.innerHTML = `<p class="text-danger">Error: ${error.message}</p>`;
+            });
+        });
+    </script>
+</body>
+</html> 

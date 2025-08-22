@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard | Employee Leave Management{% endblock %}
+
+{% block content %}
+<!-- start page title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0 font-size-18">Dashboard</h4>
+
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);">Dashboards</a></li>
+                    <li class="breadcrumb-item active">Dashboard</li>
+                </ol>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- end page title -->
+
+<div class="row">
+    <div class="col-xl-12">
+        <div class="row d-flex flex-wrap gap-3">
+            <div class="col-md-2">
+                <div class="card mini-stats-wid">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                <a href="{% url 'faculties' %}" key="t-saas" style="color: black;"><h4>Employees</h4></a>
+                                <p class="text-muted fw-medium mb-0">{{ faculty_count }}</p>
+                            </div>
+
+                            <div class="flex-shrink-0 align-self-center">
+                                <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                    <span class="avatar-title">
+                                        <i class="bx bx-copy-alt font-size-24"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card mini-stats-wid">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                <a href="{% url 'hods' %}" key="t-crypto" style="color: black;"><h4>HR's</h4></a>
+                                <p class="text-muted fw-medium mb-0">{{ hod_count }}</p>
+                            </div>
+
+                            <div class="flex-shrink-0 align-self-center ">
+                                <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                    <span class="avatar-title">
+                                        <i class="bx bx-copy-alt font-size-24"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card mini-stats-wid">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                <a href="{% url 'departments' %}" key="t-blog" style="color: black;"><h4>Departments</h4></a>
+                                <p class="text-muted fw-medium mb-0">{{ department_count }}</p>
+                            </div>
+
+                            <div class="flex-shrink-0 align-self-center">
+                                <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                    <span class="avatar-title">
+                                        <i class="bx bx-copy-alt font-size-24"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card mini-stats-wid">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                <a href="{% url 'schedules_list' %}" key="t-jobs" style="color: black;"><h4>Schedules</h4></a>
+                                <p class="text-muted fw-medium mb-0">{{ faculty_count }}</p>
+                            </div>
+
+                            <div class="flex-shrink-0 align-self-center">
+                                <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                    <span class="avatar-title">
+                                        <i class="bx bx-copy-alt font-size-24"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card mini-stats-wid">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                <a href="{% url 'leaves' %}" key="t-jobs" style="color: black;"><h4>Leave Types</h4></a>
+                                <p class="text-muted fw-medium mb-0">{{ leave_count }}</p>
+                            </div>
+                            <div class="flex-shrink-0 align-self-center">
+                                <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                    <span class="avatar-title">
+                                        <i class="bx bx-copy-alt font-size-24"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end row -->
+<!-- end row -->
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title mb-4">Leave Data of Employees</h4>
+                <div class="table-responsive">
+                    <table class="table align-middle table-nowrap mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="align-middle">Employee ID</th>
+                                <th class="align-middle">Employee Name</th>
+                                <th class="align-middle">Department</th>
+                                <th class="align-middle">Date</th>
+                                <th class="align-middle">Status</th>
+                                <th class="align-middle">View Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for leave in leave_applications %}
+                            <tr>
+                                <td>{{ leave.employee_id }}</td>
+                                <td>{{ leave.employee_name }}</td>
+                                <td>{{ leave.department.department_name }}</td>
+                                <td>
+                                    {{ leave.applied_at }}
+                                </td>
+                                <td>
+                                    {% if leave.status == "Approved" %}
+                                        <span class="badge badge-pill badge-soft-success font-size-11">{{ leave.status }}</span>
+                                    {% elif leave.status == "Rejected" %}
+                                        <span class="badge badge-pill badge-soft-danger font-size-11">{{ leave.status }}</span>
+                                    {% else %}
+                                        <span class="badge badge-pill badge-soft-warning font-size-11">{{ leave.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <!-- Button trigger modal -->
+                                    <button type="button" class="btn btn-primary btn-sm btn-rounded waves-effect waves-light" data-bs-toggle="modal" data-bs-target=".transaction-detailModal">
+                                        View Details
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- end table-responsive -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end row -->
+{% endblock %}
+
+{% block extrajs %}
+<!-- apexcharts -->
+<script src="{% static 'assets/libs/apexcharts/apexcharts.min.js' %}"></script>
+
+<!-- dashboard init -->
+<script src="{% static 'assets/js/pages/dashboard.init.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,433 @@
+{%load static%}
+<!doctype html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8" />
+    <title>Form Layouts | Skote - Admin & Dashboard Template</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
+    <meta content="Themesbrand" name="author" />
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="{% static 'assets/images/favicon.ico' %}">
+
+    <!-- Bootstrap Css -->
+    <link href="{% static 'assets/css/bootstrap.min.css' %}" id="bootstrap-style" rel="stylesheet" type="text/css" />
+    <!-- Icons Css -->
+    <link href="{% static 'assets/css/icons.min.css' %}" rel="stylesheet" type="text/css" />
+    <!-- App Css-->
+    <link href="{% static 'assets/css/app.min.css' %}" id="app-style" rel="stylesheet" type="text/css" />
+    <!-- App js -->
+    <script src="{% static 'assets/js/plugin.js' %}"></script>
+
+</head>
+
+<body data-sidebar="dark">
+
+    <!-- <body data-layout="horizontal" data-topbar="dark"> -->
+
+    <!-- Begin page -->
+    <div id="layout-wrapper">
+
+
+        <header id="page-topbar">
+            <div class="navbar-header">
+                <div class="d-flex">
+                    <!-- LOGO -->
+                    <div class="navbar-brand-box">
+                        <a href="index.html" class="logo logo-dark">
+                            <span class="logo-sm">
+                                <img src="{% static 'assets/images/logo.svg' %}" alt="" height="22">
+                            </span>
+                            <span class="logo-lg">
+                                <img src="{% static 'assets/images/logo-dark.png' %}" alt="" height="17">
+                            </span>
+                        </a>
+
+                        <a href="index.html" class="logo logo-light">
+                            <span class="logo-sm">
+                                <img src="{% static 'assets/images/logo-light.svg' %}" alt="" height="22">
+                            </span>
+                            <span class="logo-lg">
+                                <img src="{% static 'assets/images/logo-light.png' %}" alt="" height="19">
+                            </span>
+                        </a>
+                    </div>
+
+                    <button type="button" class="btn btn-sm px-3 font-size-16 header-item waves-effect"
+                        id="vertical-menu-btn">
+                        <i class="fa fa-fw fa-bars"></i>
+                    </button>
+
+                    <!-- App Search-->
+                    <form class="app-search d-none d-lg-block">
+                        <div class="position-relative">
+                            <input type="text" class="form-control" placeholder="Search...">
+                            <span class="bx bx-search-alt"></span>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="d-flex">
+
+                    <div class="dropdown d-inline-block d-lg-none ms-2">
+                        <button type="button" class="btn header-item noti-icon waves-effect"
+                            id="page-header-search-dropdown" data-bs-toggle="dropdown" aria-haspopup="true"
+                            aria-expanded="false">
+                            <i class="mdi mdi-magnify"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+                            aria-labelledby="page-header-search-dropdown">
+
+                            <form class="p-3">
+                                <div class="form-group m-0">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="Search ..."
+                                            aria-label="Recipient's username">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="submit"><i
+                                                    class="mdi mdi-magnify"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="dropdown d-inline-block">
+                        <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img class="rounded-circle header-profile-user"
+                                src="{% static 'assets/images/users/avatar-1.jpg' %}" alt="Header Avatar">
+                            <span class="d-none d-xl-inline-block ms-1" key="t-henry">User</span>
+                            <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <!-- item-->
+                            <a class="dropdown-item" href="#"><i class="bx bx-user font-size-16 align-middle me-1"></i>
+                                <span key="t-profile">Profile</span></a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-danger" href="#"><i
+                                    class="bx bx-power-off font-size-16 align-middle me-1 text-danger"></i> <span
+                                    key="t-logout">Logout</span></a>
+                        </div>
+                    </div>
+
+                    <div class="dropdown d-inline-block">
+                        <button type="button" class="btn header-item noti-icon right-bar-toggle waves-effect">
+                            <i class="bx bx-cog bx-spin"></i>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </header>
+
+        <!-- ========== Left Sidebar Start ========== -->
+        <div class="vertical-menu">
+
+            <div data-simplebar class="h-100">
+
+                <!--- Sidemenu -->
+                <div id="sidebar-menu">
+                    <!-- Left Menu Start -->
+                    <ul class="metismenu list-unstyled" id="side-menu">
+                        <li class="menu-title" key="t-menu">Menu</li>
+
+                        <li>
+                            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                <i class="bx bx-home-circle"></i>
+                                <span key="t-dashboards">Dashboards</span>
+                            </a>
+                            <ul class="sub-menu" aria-expanded="false">
+                                <li><a href="index.html" key="t-default">Home</a></li>
+                                <li><a href="dashboard-saas.html" key="t-saas">Schedules</a></li>
+                                <li><a href="dashboard-crypto.html" key="t-crypto">Leave History</a></li>
+                                <li><a href="dashboard-blog.html" key="t-blog">Leave Count</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Sidebar -->
+            </div>
+        </div>
+        <!-- Left Sidebar End -->
+
+
+
+        <!-- ============================================================== -->
+        <!-- Start right Content here -->
+        <!-- ============================================================== -->
+        <div class="main-content">
+
+            <div class="page-content">
+                <div class="container-fluid">
+
+                    <!-- start page title -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                                <h4 class="mb-sm-0 font-size-18">Leave Application</h4>
+
+                                <div class="page-title-right">
+                                    <ol class="breadcrumb m-0">
+                                        <li class="breadcrumb-item"><a href="javascript: void(0);">Form</a></li>
+                                        <li class="breadcrumb-item active">Leave Form</li>
+                                    </ol>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end page title -->
+
+                    <div class="row">
+                        <div class="col-xl-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title mb-4">Leave Application Form</h4>
+
+                                    <form method="POST" action="{% url 'apply_leave' %}">
+                                        {% csrf_token %}
+                                        <div class="row">
+                                            <div class="col-lg-3">
+                                                <div class="mb-3">
+                                                    <label for="formrow-firstname-input" class="form-label">Enter
+                                                        ID</label>
+                                                    <input type="text" class="form-control" id="formrow-firstname-input" name="employee_id"
+                                                        placeholder="Enter Your ID" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3">
+                                                <div class="mb-3">
+                                                    <label for="formrow-firstname-input" class="form-label">Enter
+                                                        Name</label>
+                                                    <input type="text" class="form-control" id="formrow-firstname-input" name="employee_name"
+                                                        placeholder="Enter Your Name" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3">
+                                                <div class="mb-3">
+                                                    <label for="formrow-inputState"
+                                                        class="form-label">Department</label>
+                                                    <select id="formrow-inputState" class="form-select" name="department_id" required>
+                                                        <option selected>Choose</option>
+                                                        {% for department in departments %}
+                                                            <option value="{{ department.id }}">{{ department.department_name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-3">
+                                                <div class="mb-3">
+                                                    <label for="formrow-inputState" class="form-label">Leave
+                                                        Type</label>
+                                                    <select id="formrow-inputState" class="form-select" name="leave_id" required>
+                                                        <option selected>Choose...</option>
+                                                        {% for leave in leaves %}
+                                                            <option value="{{ leave.id }}">{{ leave.leave_name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div class="mb-3">
+                                                    <label for="from-date" class="form-label">From Date</label>
+                                                    <input type="date" class="form-control" id="from-date" name="from_date" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="mb-3">
+                                                    <label for="to-date" class="form-label">To Date</label>
+                                                    <input type="date" class="form-control" id="to-date" name="to_date" required>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="mb-4">
+                                                <label for="formmessage">Enter Leave Description :</label>
+                                                <textarea id="formmessage" class="form-control" rows="5"
+                                                    placeholder="Enter Your Leave Description" required name="leave_description"
+                                                    style="height: 300px;"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="mb-4">
+                                                <h2 style="text-align: center;" id="probabilty_score">Probability Score: --</h2>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="text-center">
+                                            <button type="submit" class="btn btn-primary w-md">Submit</button>
+                                        </div>
+                                        
+                                    </form>
+                                </div>
+                                <!-- end card body -->
+                            </div>
+                            <!-- end card -->
+                        </div>
+                        <!-- end col -->
+                    </div>
+                    <!-- end row -->
+                </div> <!-- container-fluid -->
+            </div>
+            <!-- End Page-content -->
+
+
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <script>document.write(new Date().getFullYear())</script> © Skote.
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="text-sm-end d-none d-sm-block">
+                                Design & Develop by Themesbrand
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+        <!-- end main content-->
+
+    </div>
+    <!-- END layout-wrapper -->
+
+    <!-- Right Sidebar -->
+    <div class="right-bar">
+        <div data-simplebar class="h-100">
+            <div class="rightbar-title d-flex align-items-center px-3 py-4">
+
+                <h5 class="m-0 me-2">Settings</h5>
+
+                <a href="javascript:void(0);" class="right-bar-toggle ms-auto">
+                    <i class="mdi mdi-close noti-icon"></i>
+                </a>
+            </div>
+
+            <!-- Settings -->
+            <hr class="mt-0" />
+            <h6 class="text-center mb-0">Choose Layouts</h6>
+
+            <div class="p-4">
+                <div class="mb-2">
+                    <img src="{% static 'assets/images/layouts/layout-1.jpg' %}" class="img-thumbnail"
+                        alt="layout images">
+                </div>
+
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input theme-choice" type="checkbox" id="light-mode-switch" checked>
+                    <label class="form-check-label" for="light-mode-switch">Light Mode</label>
+                </div>
+
+                <div class="mb-2">
+                    <img src="{% static 'assets/images/layouts/layout-2.jpg' %}" class="img-thumbnail"
+                        alt="layout images">
+                </div>
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input theme-choice" type="checkbox" id="dark-mode-switch">
+                    <label class="form-check-label" for="dark-mode-switch">Dark Mode</label>
+                </div>
+
+                <div class="mb-2">
+                    <img src="{% static 'assets/images/layouts/layout-3.jpg' %}" class="img-thumbnail"
+                        alt="layout images">
+                </div>
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input theme-choice" type="checkbox" id="rtl-mode-switch">
+                    <label class="form-check-label" for="rtl-mode-switch">RTL Mode</label>
+                </div>
+
+                <div class="mb-2">
+                    <img src="{% static 'assets/images/layouts/layout-4.jpg' %}" class="img-thumbnail"
+                        alt="layout images">
+                </div>
+                <div class="form-check form-switch mb-5">
+                    <input class="form-check-input theme-choice" type="checkbox" id="dark-rtl-mode-switch">
+                    <label class="form-check-label" for="dark-rtl-mode-switch">Dark RTL Mode</label>
+                </div>
+
+
+            </div>
+
+        </div> <!-- end slimscroll-menu-->
+    </div>
+    <!-- /Right-bar -->
+
+    <!-- Right bar overlay-->
+    <div class="rightbar-overlay"></div>
+
+    <!-- JAVASCRIPT -->
+    <script src="{% static 'assets/libs/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/libs/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/libs/metismenu/metisMenu.min.js' %}"></script>
+    <script src="{% static 'assets/libs/simplebar/simplebar.min.js' %}"></script>
+    <script src="{% static 'assets/libs/node-waves/waves.min.js' %}"></script>
+
+    <script src="{% static 'assets/js/app.js' %}"></script>
+    <script>
+        document.getElementById("formmessage").addEventListener("input", function() {
+            let leaveText = this.value;
+            const probabilityScoreElement = document.getElementById("probabilty_score");
+    
+            if (leaveText.length > 10) {  // Only analyze when enough text is entered
+                probabilityScoreElement.innerText = "Calculating probability score...";
+                
+                fetch("{% url 'get_probability_score' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+                    body: JSON.stringify({ leave_description: leaveText })
+                })
+                .then(response => response.json())  // Always parse JSON, even for errors
+                .then(data => {
+                    console.log("API response:", data);
+                    
+                    if (data.probability_score !== undefined) {
+                        const score = parseFloat(data.probability_score);
+                        const percentage = (score * 100).toFixed(1);
+                        
+                        let color;
+                        if (score < 0.4) {
+                            color = "#dc3545"; // Red - low chance
+                        } else if (score < 0.7) {
+                            color = "#ffc107"; // Yellow - medium chance
+                        } else {
+                            color = "#28a745"; // Green - high chance
+                        }
+                        
+                        probabilityScoreElement.innerHTML = `Probability Score: <span style="color: ${color}; font-weight: bold;">${percentage}%</span>`;
+                        
+                        // Show warning if this is a fallback score due to error
+                        if (data.error || data.api_error) {
+                            console.warn("API warning:", data.error || data.api_error);
+                            probabilityScoreElement.innerHTML += `<small class="d-block text-muted">Using estimated score due to AI service limitation</small>`;
+                        }
+                    } else {
+                        probabilityScoreElement.innerText = "Error calculating score";
+                        console.error("Invalid response format:", data);
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching probability score:", error);
+                    probabilityScoreElement.innerHTML = "Score unavailable at this time<br><small>Please submit your request anyway.</small>";
+                });
+            } else {
+                probabilityScoreElement.innerText = "Probability Score: --";
+            }
+        });
+    </script>
+
+</body>
+
+</html>
